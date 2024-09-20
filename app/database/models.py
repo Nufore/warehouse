@@ -17,6 +17,15 @@ class Product(Base):
     price: Mapped[float] = mapped_column(Numeric(precision=9, scale=2))
     stock_balance: Mapped[int] = mapped_column(Integer())
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "price": self.price,
+            "stock_balance": self.stock_balance,
+        }
+
 
 class OrderStatus(Base):
     __tablename__ = "order_statuses"
