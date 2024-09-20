@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     Конфиг для API
     """
     api_prefix: str = "/api"
+    products_prefix: str = "/products"
+    orders_prefix: str = "/orders"
 
     db: DbSettings = DbSettings()
 

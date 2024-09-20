@@ -8,6 +8,7 @@ from app.config import settings
 from app.database.models import Base
 from app.database.db_helper import db_helper
 from app.fastapi_app.products.views import router as products_router
+from app.fastapi_app.orders.views import router as orders_router
 
 
 @asynccontextmanager
@@ -18,7 +19,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(router=products_router, prefix=settings.api_prefix)
+app.include_router(router=products_router, prefix=settings.products_prefix)
+app.include_router(router=orders_router, prefix=settings.orders_prefix)
 
 
 @app.exception_handler(Exception)

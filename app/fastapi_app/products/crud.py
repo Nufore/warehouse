@@ -1,3 +1,5 @@
+from fastapi import status, HTTPException
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,10 +31,14 @@ async def get_products(session: AsyncSession):
 
 
 async def get_product(product_id: int, session: AsyncSession):
-    result: Product | None = await session.get(Product, product_id)
-    if result:
-        return result.to_json()
-    return None
+    product: Product | None = await session.get(Product, product_id)
+    if product:
+        return product.to_json()
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Product {product_id} not found.",
+    )
 
 
 async def update_product(
@@ -50,7 +56,10 @@ async def update_product(
 
         return product.to_json()
 
-    return None
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Product {product_id} not found.",
+    )
 
 
 async def delete_product(product_id: int, session: AsyncSession):
@@ -60,5 +69,8 @@ async def delete_product(product_id: int, session: AsyncSession):
         await session.commit()
         return {"Message": f"Product {product.id} deleted successfully."}
 
-    return None
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Product {product_id} not found.",
+    )
 
