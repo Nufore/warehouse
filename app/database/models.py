@@ -17,6 +17,8 @@ class Product(Base):
     price: Mapped[float] = mapped_column(Numeric(precision=9, scale=2))
     stock_balance: Mapped[int] = mapped_column(Integer())
 
+    order_items: Mapped["OrderItem"] = relationship(back_populates="product")
+
     def to_json(self):
         return {
             "id": self.id,
@@ -31,7 +33,7 @@ class OrderStatus(Base):
     __tablename__ = "order_statuses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(20))
+    name: Mapped[str] = mapped_column(String(20), unique=True)
 
 
 class Order(Base):
@@ -42,6 +44,7 @@ class Order(Base):
         DateTime(), default=datetime.datetime.now()
     )
     status_id: Mapped[int] = mapped_column(ForeignKey("order_statuses.id"))
+    status: Mapped["OrderStatus"] = relationship("OrderStatus")
 
     order_items: Mapped[list["OrderItem"]] = relationship(
         back_populates="order",
@@ -52,7 +55,16 @@ class Order(Base):
         return {
             "id": self.id,
             "created_date": self.created_date,
+            "status": self.status.name,
             "status_id": self.status_id,
+        }
+
+    def detail_data_to_json(self):
+        return {
+            "order_id": self.id,
+            "order_status": self.status.name,
+            "order_date": self.created_date,
+            "products": [order_item.to_json() for order_item in self.order_items],
         }
 
 
@@ -68,3 +80,10 @@ class OrderItem(Base):
     product: Mapped[Product] = relationship("Product", back_populates="order_items")
 
     count: Mapped[int] = mapped_column(Integer())
+
+    def to_json(self):
+        return {
+            "product_id": self.product.id,
+            "product_name": self.product.name,
+            "count": self.count,
+        }

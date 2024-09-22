@@ -73,4 +73,3 @@ async def delete_product(product_id: int, session: AsyncSession):
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Product {product_id} not found.",
     )
-

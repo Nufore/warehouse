@@ -9,7 +9,7 @@ from app.database.db_helper import db_helper
 router = APIRouter(tags=["Products"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_product(
     product: CreateProduct,
     session: AsyncSession = Depends(db_helper.session_getter),
@@ -17,7 +17,7 @@ async def create_product(
     return await crud.create_product(session=session, product=product)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=ResponseProducts)
+@router.get("", status_code=status.HTTP_200_OK, response_model=ResponseProducts)
 async def get_products(session: AsyncSession = Depends(db_helper.session_getter)):
     return await crud.get_products(session=session)
 

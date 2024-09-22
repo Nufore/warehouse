@@ -10,3 +10,6 @@ class OrderItem(BaseModel):
 class OrderList(BaseModel):
     order_list: List[OrderItem]
 
+
+class ChangeStatus(BaseModel):
+    status_id: int
