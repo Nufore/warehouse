@@ -25,10 +25,8 @@ async def get_orders(session: AsyncSession = Depends(db_helper.session_getter)):
 
 
 @router.get("/{order_id}", status_code=status.HTTP_200_OK)
-async def get_order_detail(
-    order_id: int, session: AsyncSession = Depends(db_helper.session_getter)
-):
-    return await crud.get_order_detail(session=session, order_id=order_id)
+async def get_order_detail(order: Order = Depends(order_by_id)):
+    return order.detail_data_to_json()
 
 
 @router.put("/{order_id}/status", status_code=status.HTTP_200_OK)

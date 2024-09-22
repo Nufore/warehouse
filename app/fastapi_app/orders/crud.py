@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .schemas import OrderList, ChangeStatus
 
 from app.database.models import Order, OrderItem, Product, OrderStatus
+from ..products.dependencies import product_by_id
 
 
 async def create_order(order: OrderList, session: AsyncSession):
@@ -12,7 +13,7 @@ async def create_order(order: OrderList, session: AsyncSession):
 
     order_list_to_db = []
     for order_item in order.order_list:
-        product = await session.get(Product, order_item.product_id)
+        product = await product_by_id(product_id=order_item.product_id, session=session)
         if order_item.count > product.stock_balance:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -48,21 +49,6 @@ async def get_orders(session: AsyncSession):
     orders = result.all()
 
     return {"orders": [order.to_json() for order in orders]}
-
-
-async def get_order_detail(order_id: int, session: AsyncSession):
-    stmt = (
-        select(Order)
-        .options(
-            selectinload(Order.order_items).subqueryload(OrderItem.product),
-            selectinload(Order.status),
-        )
-        .filter(Order.id == order_id)
-    )
-
-    order = await session.scalar(stmt)
-
-    return order.detail_data_to_json()
 
 
 async def change_order_status(

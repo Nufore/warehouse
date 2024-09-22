@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.db_helper import db_helper
-from app.database.models import Order
+from app.database.models import Order, OrderItem
 
 
 async def order_by_id(
@@ -14,7 +14,12 @@ async def order_by_id(
     session: AsyncSession = Depends(db_helper.session_getter),
 ) -> Order:
     stmt = (
-        select(Order).options(selectinload(Order.status)).filter(Order.id == order_id)
+        select(Order)
+        .options(
+            selectinload(Order.order_items).subqueryload(OrderItem.product),
+            selectinload(Order.status),
+        )
+        .filter(Order.id == order_id)
     )
     order = await session.scalar(stmt)
     if order:

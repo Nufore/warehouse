@@ -42,34 +42,20 @@ async def get_product(product_id: int, session: AsyncSession):
 
 
 async def update_product(
-    product_id: int, session: AsyncSession, update_data: UpdateProduct
+    product: Product, session: AsyncSession, update_data: UpdateProduct
 ):
-    product: Product | None = await session.get(Product, product_id)
-    if product:
-        product.name = update_data.name
-        product.description = update_data.description
-        product.price = update_data.price
-        product.stock_balance = update_data.stock_balance
+    product.name = update_data.name
+    product.description = update_data.description
+    product.price = update_data.price
+    product.stock_balance = update_data.stock_balance
 
-        session.add(product)
-        await session.commit()
+    session.add(product)
+    await session.commit()
 
-        return product.to_json()
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Product {product_id} not found.",
-    )
+    return product.to_json()
 
 
-async def delete_product(product_id: int, session: AsyncSession):
-    product: Product | None = await session.get(Product, product_id)
-    if product:
-        await session.delete(product)
-        await session.commit()
-        return {"Message": f"Product {product.id} deleted successfully."}
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Product {product_id} not found.",
-    )
+async def delete_product(product: Product, session: AsyncSession):
+    await session.delete(product)
+    await session.commit()
+    return {"Message": f"Product {product.id} deleted successfully."}
